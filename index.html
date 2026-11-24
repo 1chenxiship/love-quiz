@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>心动频率研究所 · 恋爱人格 × 情侣适配度测试</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="paper-backdrop" aria-hidden="true"></div>
+
+  <div class="app-shell">
+    <!-- 顶部编辑式导航 -->
+    <header class="topbar" id="topbar">
+      <button class="brand-btn" id="brandHomeBtn" type="button" aria-label="返回首页">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="9.5" />
+            <path d="M12 4.5v15M4.5 12h15M7.2 7.2l9.6 9.6M16.8 7.2l-9.6 9.6" opacity="0.45" />
+            <circle cx="12" cy="12" r="2.2" fill="currentColor" />
+          </svg>
+        </span>
+        <span class="brand-text" id="brandTitle">心动频率研究所</span>
+      </button>
+      <div class="topbar-actions">
+        <button class="ghost-pill" id="openAtlasBtn" type="button">08 原型图鉴</button>
+        <button class="ghost-pill hidden" id="screenshotModeBtn" type="button">纯净海报模式</button>
+        <button class="ghost-pill hidden" id="topbarResetBtn" type="button">返回首页</button>
+      </div>
+    </header>
+
+    <!-- 1. 首页 -->
+    <main class="view active" id="view-home">
+      <section class="hero-card editorial-card">
+        <div class="hero-masthead">
+          <span class="hero-badge" id="heroBadge">VOL. 01 · 40 LIFE SLICES · SOLO &amp; COUPLE</span>
+          <span class="hero-issue">ARCHIVE EDITION</span>
+        </div>
+
+        <h1 class="hero-title" id="heroTitle">测测你的恋爱人格<br />与你们的心动适配度</h1>
+        <p class="hero-subtitle" id="heroSubtitle">
+          不考晦涩理论，只聊消息回复、约会细节、争吵反应与隐秘心动。<br />
+          三分钟看清你在爱里的真实模样，亦可生成专属口令或直接对照双方人格。
+        </p>
+
+        <!-- 被邀请横幅（通过 ?partner= 链接进入时展示） -->
+        <div class="invite-banner hidden" id="inviteBanner">
+          <div class="invite-banner-seal" aria-hidden="true">№</div>
+          <div class="invite-banner-body">
+            <div class="invite-banner-title" id="inviteBannerTitle">收到一份恋爱合拍邀请</div>
+            <div class="invite-banner-desc" id="inviteBannerDesc">完成下方 40 道小题，即可立即解锁你们的双人适配报告</div>
+          </div>
+          <button class="text-btn" id="clearInviteBtn" type="button">取消邀请</button>
+        </div>
+
+        <!-- 编辑式分段模式切换 -->
+        <div class="mode-switcher-wrap">
+          <div class="mode-grid" id="modeGrid" role="tablist" aria-label="测试模式选择">
+            <button class="mode-card selected" data-mode="solo" type="button" role="tab" aria-selected="true">
+              <span class="mode-index">01</span>
+              <span class="mode-name">单人探索</span>
+            </button>
+            <button class="mode-card" data-mode="direct" type="button" role="tab" aria-selected="false">
+              <span class="mode-index">02</span>
+              <span class="mode-name">双人直配</span>
+            </button>
+            <button class="mode-card" data-mode="compare" type="button" role="tab" aria-selected="false">
+              <span class="mode-index">03</span>
+              <span class="mode-name">口令比对</span>
+            </button>
+          </div>
+          <p class="mode-caption" id="modeCaption">
+            完整作答 40 道生活切片，生成个人六维档案，并可生成合拍口令或直接选 TA 的原型比对。
+          </p>
+        </div>
+
+        <!-- 单人答题面板 -->
+        <div class="start-panel" id="startPanel">
+          <div class="input-row">
+            <label class="field-label" for="nicknameInput" id="nicknameLabel">署名（选填，将印于个人档案海报）</label>
+            <input
+              type="text"
+              id="nicknameInput"
+              class="text-input"
+              maxlength="12"
+              placeholder="例如：林夕 / 小橘 / 匿名观察员"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="start-actions">
+            <button class="primary-btn" id="startQuizBtn" type="button">
+              <span id="startQuizBtnText">开始 40 题恋爱探索</span>
+              <span class="btn-arrow">→</span>
+            </button>
+            <button class="secondary-btn hidden" id="resumeQuizBtn" type="button">
+              继续上次进度（第 <span id="resumeIndexText">1</span> / 40 题）
+            </button>
+          </div>
+        </div>
+
+        <!-- 双人人格直接对比面板（免答题） -->
+        <div class="direct-panel hidden" id="directComparePanel">
+          <div class="direct-columns">
+            <div class="direct-col direct-col-a">
+              <div class="direct-col-head">
+                <span class="person-dot dot-a"></span>
+                <span>第一位 · 选择 TA 的恋爱人格</span>
+              </div>
+              <input
+                type="text"
+                id="directNameA"
+                class="text-input direct-name-input"
+                maxlength="12"
+                placeholder="署名（选填，如：小橘）"
+                autocomplete="off"
+              />
+              <div class="arch-pick-grid" id="directGridA"></div>
+            </div>
+
+            <div class="direct-col direct-col-b">
+              <div class="direct-col-head">
+                <span class="person-dot dot-b"></span>
+                <span>第二位 · 选择你的恋爱人格</span>
+              </div>
+              <input
+                type="text"
+                id="directNameB"
+                class="text-input direct-name-input"
+                maxlength="12"
+                placeholder="署名（选填，如：阿泽）"
+                autocomplete="off"
+              />
+              <div class="arch-pick-grid" id="directGridB"></div>
+            </div>
+          </div>
+
+          <div class="direct-live-preview" id="directLivePreview">
+            <span class="direct-preview-label">当前对照</span>
+            <span class="direct-preview-pair" id="directLivePairText">恒温港湾守望者 × 高甜氛围造梦师</span>
+          </div>
+
+          <button class="primary-btn" id="runDirectCompareBtn" type="button">
+            <span>生成双人对照档案</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+
+        <!-- 口令直接比对面板 -->
+        <div class="compare-panel hidden" id="comparePanel">
+          <div class="input-row">
+            <label class="field-label" for="passcodeAInput">第一位的合拍口令或邀请链接</label>
+            <textarea
+              id="passcodeAInput"
+              class="text-input textarea-input"
+              rows="2"
+              placeholder="粘贴 LOVE-... 口令或完整分享链接"
+            ></textarea>
+          </div>
+          <div class="input-row">
+            <label class="field-label" for="passcodeBInput">第二位的合拍口令或邀请链接</label>
+            <textarea
+              id="passcodeBInput"
+              class="text-input textarea-input"
+              rows="2"
+              placeholder="粘贴 LOVE-... 口令（若本机刚测过，可点击下方自动填入）"
+            ></textarea>
+          </div>
+          <div class="compare-helpers">
+            <button class="text-btn hidden" id="fillMyLatestBtn" type="button">填入我最近一次的测试口令</button>
+            <span class="error-hint hidden" id="compareErrorHint"></span>
+          </div>
+          <button class="primary-btn" id="runCompareBtn" type="button">
+            <span>测算精确适配度</span>
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+
+        <!-- 极简底栏索引 -->
+        <div class="meta-strip">
+          <span><strong>06</strong> 恋爱维度</span>
+          <i class="meta-sep">/</i>
+          <span><strong>08</strong> 人格原型</span>
+          <i class="meta-sep">/</i>
+          <span><strong>40</strong> 生活切片</span>
+          <i class="meta-sep">/</i>
+          <span><strong>3:4</strong> 长图留档</span>
+        </div>
+      </section>
+
+      <footer class="home-footer">
+        <p id="disclaimerText">趣味人格探索与情侣互动测试 · 非专业心理诊断或婚恋评估 · 全部运算均在本地完成，不上传任何隐私数据</p>
+      </footer>
+    </main>
+
+    <!-- 2. 答题页面 -->
+    <main class="view" id="view-quiz">
+      <section class="quiz-container editorial-card">
+        <div class="quiz-header">
+          <div class="quiz-meta-row">
+            <span class="chapter-pill" id="chapterPill">第一篇 · 日常习惯与微瞬间</span>
+            <span class="player-pill hidden" id="quizPlayerPill">Player A</span>
+            <span class="progress-count" id="progressCount">01 / 40</span>
+          </div>
+          <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="chapter-dots" id="chapterDots" aria-hidden="true"></div>
+        </div>
+
+        <div class="question-stage" id="questionStage">
+          <div class="chapter-milestone hidden" id="chapterMilestone"></div>
+          <div class="question-kicker" id="questionKicker">SLICE 01</div>
+          <h2 class="question-text" id="questionText">题目加载中...</h2>
+          <div class="options-list" id="optionsList"></div>
+        </div>
+
+        <div class="quiz-footer">
+          <button class="ghost-btn" id="prevQuestionBtn" type="button" disabled>← 上一题</button>
+          <span class="keyboard-tip">键盘快捷键 A–D 或 1–4 作答</span>
+          <button class="text-btn" id="restartDuringQuizBtn" type="button">退出重测</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- 3. 单人结果页面 -->
+    <main class="view" id="view-result">
+      <div class="result-layout">
+        <!-- 典藏海报卡片 -->
+        <article class="poster-card" id="soloPosterCard">
+          <div class="poster-inner-frame">
+            <div class="poster-top-bar">
+              <span class="poster-brand" id="soloPosterBrand">心动频率研究所 · 恋爱人格档案</span>
+              <span class="poster-code" id="soloArchetypeCode">LP-01</span>
+            </div>
+
+            <div class="poster-hero">
+              <div class="poster-user-line">
+                <span id="soloNicknameBadge">专属恋爱人格档案</span>
+              </div>
+              <div class="poster-emblem" id="soloEmblem" aria-hidden="true"></div>
+              <h2 class="poster-archetype-name" id="soloArchetypeName">恒温港湾守望者</h2>
+              <p class="poster-archetype-en" id="soloArchetypeEn">The Steady Harbor</p>
+              <blockquote class="poster-quote" id="soloQuote">
+                “热恋时我替你挡风，平淡时我把灯留到最晚。”
+              </blockquote>
+              <div class="poster-tags" id="soloTags"></div>
+            </div>
+
+            <div class="poster-metrics">
+              <div class="radar-wrap">
+                <svg id="soloRadarSvg" viewBox="0 0 300 260" class="radar-svg" aria-label="六维恋爱雷达图"></svg>
+              </div>
+              <div class="dimension-bars" id="soloDimensionBars"></div>
+            </div>
+
+            <div class="poster-mini-summary" id="soloMiniSummary"></div>
+          </div>
+        </article>
+
+        <!-- 深度解读报告区 -->
+        <section class="report-stack">
+          <div class="report-card editorial-card">
+            <h3 class="report-heading"><span class="heading-num">I.</span> 恋爱性格画像</h3>
+            <p class="report-body" id="soloTraitsText"></p>
+          </div>
+
+          <!-- 可选商业门禁（config.paywall.enabled=true 时显示） -->
+          <div class="report-card paywall-card hidden" id="soloPaywallCard">
+            <h3 class="report-heading" id="soloPaywallTitle">解锁完整恋爱深度档案</h3>
+            <p class="report-sub" id="soloPaywallDesc"></p>
+            <div class="inline-partner-box">
+              <input type="text" id="soloUnlockInput" class="text-input" placeholder="输入兑换口令（如店铺发放的卡密）" autocomplete="off" />
+              <button class="primary-btn compact-btn" id="soloUnlockBtn" type="button">验证并展开</button>
+            </div>
+            <div class="toast-inline hidden" id="soloUnlockHint"></div>
+          </div>
+
+          <div class="deep-report-group" id="soloDeepGroup">
+            <div class="report-card editorial-card">
+              <h3 class="report-heading"><span class="heading-num">II.</span> 匹配依据解析</h3>
+              <ul class="reason-list" id="soloReasonsList"></ul>
+            </div>
+
+            <div class="report-two-col">
+              <div class="report-card editorial-card">
+                <h3 class="report-heading"><span class="heading-num">III.</span> 隐藏优势</h3>
+                <p class="report-body" id="soloStrengthText"></p>
+              </div>
+              <div class="report-card editorial-card">
+                <h3 class="report-heading"><span class="heading-num">IV.</span> 关系盲区</h3>
+                <p class="report-body" id="soloBlindspotText"></p>
+              </div>
+            </div>
+
+            <div class="report-card editorial-card">
+              <h3 class="report-heading"><span class="heading-num">V.</span> 适配原型与磨合提示</h3>
+              <div class="match-pair-grid" id="soloMatchGrid"></div>
+            </div>
+
+            <div class="report-card editorial-card easter-card">
+              <h3 class="report-heading"><span class="heading-num">VI.</span> 恋爱生活切片彩蛋</h3>
+              <div class="easter-grid" id="soloEasterGrid"></div>
+            </div>
+          </div>
+
+          <!-- 情侣合拍邀约模块 -->
+          <div class="report-card couple-cta-card" id="coupleInviteBox">
+            <div class="couple-cta-head">
+              <div>
+                <h3 class="report-heading">情侣适配度对照</h3>
+                <p class="report-sub">复制专属口令或邀请链接发给对象，也可直接点选已知原型即时比对。</p>
+              </div>
+            </div>
+            <div class="passcode-box">
+              <code class="passcode-text" id="soloPasscodeDisplay">LOVE-...</code>
+              <button class="small-btn" id="copyPasscodeBtn" type="button">复制口令</button>
+            </div>
+            <div class="cta-btn-row">
+              <button class="primary-btn compact-btn" id="copyInviteLinkBtn" type="button">复制邀请链接发给 TA</button>
+              <button class="secondary-btn compact-btn" id="pickPartnerArchBtn" type="button">直接选 TA 的人格对比</button>
+              <button class="secondary-btn compact-btn" id="enterPartnerCodeBtn" type="button">输入 TA 的口令比对</button>
+            </div>
+            <div class="inline-arch-drawer hidden" id="inlineArchDrawer">
+              <div class="inline-arch-head">
+                <span>选择 TA 的恋爱人格，立即与你本次真实作答结果生成对照报告：</span>
+                <input
+                  type="text"
+                  id="inlinePartnerNameInput"
+                  class="text-input inline-name-input"
+                  maxlength="12"
+                  placeholder="TA 的署名（选填）"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="arch-pick-grid inline-arch-grid" id="inlinePartnerArchGrid"></div>
+            </div>
+            <div class="inline-partner-box hidden" id="inlinePartnerBox">
+              <input
+                type="text"
+                id="inlinePartnerInput"
+                class="text-input"
+                placeholder="粘贴对方的 LOVE-... 口令或分享链接"
+              />
+              <button class="primary-btn compact-btn" id="inlineCompareGoBtn" type="button">立即比对</button>
+            </div>
+            <div class="toast-inline hidden" id="soloToast"></div>
+          </div>
+
+          <div class="action-bar no-screenshot">
+            <button class="primary-btn" id="downloadSoloPosterBtn" type="button">导出 3:4 纪念长图</button>
+            <button class="secondary-btn" id="toggleSoloScreenshotBtn" type="button">切换纯净海报视图</button>
+            <button class="ghost-btn" id="retakeSoloBtn" type="button">重新测试</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- 4. 双人情侣适配度结果页面 -->
+    <main class="view" id="view-couple-result">
+      <div class="result-layout">
+        <!-- 双人典藏海报卡片 -->
+        <article class="poster-card couple-poster" id="couplePosterCard">
+          <div class="poster-inner-frame">
+            <div class="poster-top-bar">
+              <span class="poster-brand">心动频率研究所 · 双人对照档案</span>
+              <span class="poster-code" id="coupleTierCode">CP-MATCH</span>
+            </div>
+
+            <div class="couple-hero">
+              <div class="couple-names-row">
+                <div class="couple-person">
+                  <span class="person-dot dot-a"></span>
+                  <span class="person-name" id="coupleNameA">TA</span>
+                  <span class="person-arch" id="coupleArchA">恒温港湾守望者</span>
+                </div>
+                <div class="couple-link-heart" aria-hidden="true">×</div>
+                <div class="couple-person">
+                  <span class="person-dot dot-b"></span>
+                  <span class="person-name" id="coupleNameB">你</span>
+                  <span class="person-arch" id="coupleArchB">高甜氛围造梦师</span>
+                </div>
+              </div>
+
+              <div class="score-ring-wrap">
+                <svg class="score-ring-svg" viewBox="0 0 140 140">
+                  <circle class="ring-bg" cx="70" cy="70" r="58" />
+                  <circle class="ring-fg" id="coupleScoreRing" cx="70" cy="70" r="58" />
+                </svg>
+                <div class="score-ring-center">
+                  <div class="score-num-row"><span class="score-num" id="coupleScoreNum">92</span><span class="score-pct">%</span></div>
+                  <span class="score-label" id="coupleScoreLabel">天作之合</span>
+                </div>
+              </div>
+
+              <h2 class="couple-headline" id="coupleHeadline">温柔托底 × 心动制造机</h2>
+              <blockquote class="poster-quote" id="coupleQuote">
+                “一个负责把浪漫写成诗，一个负责把诗变成稳稳的日常。”
+              </blockquote>
+            </div>
+
+            <div class="poster-metrics">
+              <div class="radar-wrap">
+                <div class="radar-legend">
+                  <span><i class="legend-dot dot-a"></i><em id="legendNameA">TA</em></span>
+                  <span><i class="legend-dot dot-b"></i><em id="legendNameB">你</em></span>
+                </div>
+                <svg id="coupleRadarSvg" viewBox="0 0 300 260" class="radar-svg" aria-label="双人叠层六维雷达图"></svg>
+              </div>
+              <div class="dimension-bars" id="coupleDimensionCompare"></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 双人深度报告区 -->
+        <section class="report-stack">
+          <div class="report-card editorial-card">
+            <h3 class="report-heading"><span class="heading-num">I.</span> 天生合拍点</h3>
+            <ul class="reason-list" id="coupleHarmonyList"></ul>
+          </div>
+
+          <div class="report-card paywall-card hidden" id="couplePaywallCard">
+            <h3 class="report-heading" id="couplePaywallTitle">解锁完整双人对照解析</h3>
+            <p class="report-sub" id="couplePaywallDesc"></p>
+            <div class="inline-partner-box">
+              <input type="text" id="coupleUnlockInput" class="text-input" placeholder="输入兑换口令" autocomplete="off" />
+              <button class="primary-btn compact-btn" id="coupleUnlockBtn" type="button">验证并展开</button>
+            </div>
+            <div class="toast-inline hidden" id="coupleUnlockHint"></div>
+          </div>
+
+          <div class="deep-report-group" id="coupleDeepGroup">
+            <div class="report-card editorial-card">
+              <h3 class="report-heading"><span class="heading-num">II.</span> 魅力互补区</h3>
+              <ul class="reason-list" id="coupleComplementList"></ul>
+            </div>
+
+            <div class="report-card editorial-card">
+              <h3 class="report-heading"><span class="heading-num">III.</span> 摩擦预警与保鲜处方</h3>
+              <ul class="reason-list" id="coupleFrictionList"></ul>
+            </div>
+
+            <div class="report-card editorial-card easter-card">
+              <h3 class="report-heading"><span class="heading-num">IV.</span> 双人关系彩蛋</h3>
+              <div class="easter-grid" id="coupleEasterGrid"></div>
+            </div>
+          </div>
+
+          <div class="action-bar no-screenshot">
+            <button class="primary-btn" id="downloadCouplePosterBtn" type="button">导出双人 3:4 纪念长图</button>
+            <button class="secondary-btn" id="toggleCoupleScreenshotBtn" type="button">切换纯净海报视图</button>
+            <button class="ghost-btn" id="backToSoloBtn" type="button">返回个人档案</button>
+            <button class="ghost-btn" id="retakeCoupleBtn" type="button">对比下一组</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- 08 原型图鉴弹窗 -->
+  <div class="modal-backdrop hidden" id="archetypeAtlasModal" role="dialog" aria-modal="true" aria-labelledby="atlasModalTitle">
+    <div class="modal-sheet editorial-card">
+      <div class="modal-head">
+        <div>
+          <span class="modal-kicker">ARCHIVE INDEX · 08 ARCHETYPES</span>
+          <h3 class="modal-title" id="atlasModalTitle">八大恋爱人格图鉴</h3>
+        </div>
+        <button class="ghost-pill" id="closeAtlasBtn" type="button">关闭</button>
+      </div>
+      <div class="atlas-grid" id="atlasGrid"></div>
+    </div>
+  </div>
+
+  <!-- 3:4 纪念长图预览弹窗（兼容微信/手机长按保存 + 桌面端直接下载） -->
+  <div class="modal-backdrop hidden" id="posterPreviewModal" role="dialog" aria-modal="true" aria-labelledby="posterModalTitle">
+    <div class="modal-sheet poster-modal-sheet editorial-card">
+      <div class="modal-head">
+        <div>
+          <span class="modal-kicker">EXPORT · 1080 × 1440 PNG</span>
+          <h3 class="modal-title" id="posterModalTitle">3:4 纪念长图已生成</h3>
+        </div>
+        <button class="ghost-pill" id="closePosterModalBtn" type="button">关闭</button>
+      </div>
+      <p class="poster-modal-tip">手机端或微信内可<strong>长按下方图片</strong>保存至相册，电脑端可点击下方按钮下载原图。</p>
+      <div class="poster-preview-frame">
+        <img id="posterPreviewImg" class="poster-preview-img" alt="生成的 3:4 恋爱档案长图" />
+      </div>
+      <div class="poster-modal-actions">
+        <button class="primary-btn" id="confirmDownloadPosterBtn" type="button">下载 PNG 原图</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模块化题库配置（换此文件即可变成另一款测试产品） -->
+  <script src="config/love-quiz.config.js"></script>
+  <!-- 通用测评与情侣适配引擎 -->
+  <script src="app.js"></script>
+</body>
+</html>
